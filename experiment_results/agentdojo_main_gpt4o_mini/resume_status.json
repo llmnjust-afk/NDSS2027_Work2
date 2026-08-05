@@ -1,0 +1,15 @@
+{
+  "started_at": "2026-08-05T04:16:11Z",
+  "finished_at": "2026-08-05T11:28:53Z",
+  "exit_code": 0,
+  "completed": true,
+  "resumed_from_cached_results": 97,
+  "provider": "chatanywhere",
+  "model": "gpt-4o-mini-2024-07-18",
+  "benchmark_version": "1.2.2",
+  "attacks": [
+    "important_instructions",
+    "tool_knowledge"
+  ],
+  "tool_call_batch_limit": 128
+}
