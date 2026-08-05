@@ -9,6 +9,34 @@ fi
 results_dir="$1"
 repo_root="$(git rev-parse --show-toplevel)"
 results_abs="$(realpath -m "$results_dir")"
+auth_file="$repo_root/.git/paperguru-auth.env"
+askpass_file="$repo_root/.git/paperguru-askpass.sh"
+
+cleanup() {
+  rm -f "$askpass_file"
+}
+trap cleanup EXIT
+
+if [[ -f "$auth_file" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$auth_file"
+  set +a
+  if [[ -z "${PAT:-}" ]]; then
+    echo "PAT is missing from $auth_file" >&2
+    exit 2
+  fi
+  cat >"$askpass_file" <<'SH'
+#!/bin/sh
+case "$1" in
+  *Username*) printf '%s\n' "${GITHUB_USERNAME:-llmnjust-afk}" ;;
+  *Password*) printf '%s\n' "$PAT" ;;
+  *) exit 1 ;;
+esac
+SH
+  chmod 700 "$askpass_file"
+  export GIT_ASKPASS="$askpass_file" GIT_TERMINAL_PROMPT=0
+fi
 
 case "$results_abs" in
   "$repo_root"/*) ;;
@@ -36,6 +64,7 @@ git -C "$repo_root" commit -m "Record EffectGuard experiment results ($timestamp
 
 for attempt in 1 2 3; do
   if git -C "$repo_root" push origin HEAD:main; then
+    rm -f "$auth_file"
     echo "Published experiment results to origin/main."
     exit 0
   fi
