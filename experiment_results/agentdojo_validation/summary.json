@@ -1,0 +1,20 @@
+{
+  "benchmark_version": "1.2.2",
+  "completed": true,
+  "injection_tasks": {
+    "banking": 9,
+    "slack": 5,
+    "travel": 7,
+    "workspace": 6
+  },
+  "mode": "ground_truth_suite_validation",
+  "network_model_calls": 0,
+  "suite_count": 4,
+  "user_tasks": {
+    "banking": 16,
+    "slack": 21,
+    "travel": 20,
+    "workspace": 40
+  },
+  "user_tasks_total": 97
+}

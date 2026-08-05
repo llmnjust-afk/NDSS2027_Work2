@@ -1,0 +1,12 @@
+[94mChecking suite: `workspace`[00m
+[92mSuite 'workspace' passed for all 40 user tasks![00m
+[92mSuite 'workspace' passed for all 6 injection tasks![00m
+[94mChecking suite: `travel`[00m
+[92mSuite 'travel' passed for all 20 user tasks![00m
+[92mSuite 'travel' passed for all 7 injection tasks![00m
+[94mChecking suite: `banking`[00m
+[92mSuite 'banking' passed for all 16 user tasks![00m
+[92mSuite 'banking' passed for all 9 injection tasks![00m
+[94mChecking suite: `slack`[00m
+[92mSuite 'slack' passed for all 21 user tasks![00m
+[92mSuite 'slack' passed for all 5 injection tasks![00m

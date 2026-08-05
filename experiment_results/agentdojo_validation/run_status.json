@@ -1,0 +1,5 @@
+{
+  "command": "python -m agentdojo.scripts.check_suites --no-check-injectable",
+  "exit_code": 0,
+  "completed": true
+}
