@@ -20,6 +20,20 @@ def _is_narrowing(requested: Any, actual: Any) -> bool:
     return requested == actual
 
 
+def _matches_authorization(requested: Any, actual: Any) -> bool:
+    if isinstance(requested, str) and requested.startswith("<") and requested.endswith(">"):
+        return True
+    if isinstance(requested, Mapping) and isinstance(actual, Mapping):
+        if not all(key in actual and _matches_authorization(value, actual[key]) for key, value in requested.items()):
+            return False
+        return all(key in requested or value in (None, "", [], {}) for key, value in actual.items())
+    if isinstance(requested, Sequence) and isinstance(actual, Sequence) and not isinstance(requested, str):
+        return len(requested) == len(actual) and all(
+            _matches_authorization(expected, observed) for expected, observed in zip(requested, actual)
+        )
+    return requested == actual
+
+
 class EffectPolicy:
     def evaluate(
         self, manifest: AuthorizationManifest, candidate: Effect, mode: GuardMode, now: float
@@ -42,8 +56,8 @@ class EffectPolicy:
         for name in ("principal", "session", "tool", "operation", "target", "credential_scope", "policy_version"):
             if getattr(root, name) != getattr(candidate, name):
                 return False, f"immutable field changed: {name}", root
-        if root.canonical_args != candidate.canonical_args:
-            return False, "arguments are not canonically equivalent", root
+        if not _matches_authorization(root.canonical_args, candidate.canonical_args):
+            return False, "arguments are not authorized by the canonical template", root
 
         if mode is GuardMode.FINAL_RECHECK:
             return True, "final effect equivalent", root

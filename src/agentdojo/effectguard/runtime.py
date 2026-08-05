@@ -15,7 +15,7 @@ from agentdojo.functions_runtime import (
 from .canonicalization import CanonicalizerRegistry
 from .events import EventSink, GuardEvent, NullEventSink
 from .models import AuthorizationManifest, Effect, GuardMode, ToolEffectSpec
-from .policy import EffectDeniedError, EffectPolicy
+from .policy import EffectDeniedError, EffectPolicy, _matches_authorization
 
 
 class EffectGuardRuntime(FunctionsRuntime):
@@ -131,8 +131,19 @@ class EffectGuardRuntime(FunctionsRuntime):
             return actual
 
         matches = [effect for effect in self.manifest.authorizations.values() if effect.tool == function]
-        parent = matches[0].nonce if len(matches) == 1 else None
-        return self._effect(function, kwargs, parent=parent, transformation="direct")
+        available = [
+            effect
+            for effect in matches
+            if self.manifest.consumed.get(effect.nonce, 0) < effect.cardinality
+        ]
+        equivalent = [effect for effect in available if _matches_authorization(effect.canonical_args, kwargs)]
+        selected = equivalent[0] if equivalent else (available[0] if self.mode is GuardMode.CALL_BOUNDARY and available else None)
+        return self._effect(
+            function,
+            kwargs,
+            parent=selected.nonce if selected is not None else None,
+            transformation="direct",
+        )
 
     def _record(self, decision: str, reason: str, candidate: Effect) -> None:
         self._sequence += 1
@@ -156,6 +167,8 @@ class EffectGuardRuntime(FunctionsRuntime):
         kwargs: Mapping[str, FunctionCallArgTypes],
         raise_on_error: bool = False,
     ) -> tuple[FunctionReturnType, str | None]:
+        if function not in self.tool_specs:
+            return super().run_function(env, function, kwargs, raise_on_error)
         candidate = self._candidate(function, kwargs)
         allowed, reason, root = self.policy.evaluate(self.manifest, candidate, self.mode, self.clock())
         self._record("allow" if allowed else "deny", reason, candidate)

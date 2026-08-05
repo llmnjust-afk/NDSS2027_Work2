@@ -377,7 +377,17 @@ class TaskSuite(Generic[Env]):
         else:
             prompt = user_task.GOAL
 
-        runtime = runtime_class(self.tools)
+        effectguard_mode = getattr(agent_pipeline, "effectguard_mode", None)
+        if effectguard_mode is None:
+            runtime = runtime_class(self.tools)
+        else:
+            from agentdojo.effectguard.agentdojo import build_authorized_runtime
+
+            runtime = build_authorized_runtime(
+                self.tools,
+                user_task.ground_truth(task_environment.model_copy(deep=True)),
+                mode=effectguard_mode,
+            )
         model_output = None
         messages = []
         for _ in range(3):

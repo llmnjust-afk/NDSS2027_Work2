@@ -45,6 +45,9 @@ DEFENSES = [
     "transformers_pi_detector",
     "spotlighting_with_delimiting",
     "repeat_user_prompt",
+    "call_boundary",
+    "final_recheck",
+    "effectguard",
 ]
 """Available defenses."""
 
@@ -213,6 +216,12 @@ class AgentPipeline(BasePipelineElement):
         else:
             tool_output_formatter = tool_result_to_str
 
+        if config.defense in {"call_boundary", "final_recheck", "effectguard"}:
+            tools_loop = ToolsExecutionLoop([ToolsExecutor(tool_output_formatter), llm])
+            pipeline = cls([system_message_component, init_query_component, llm, tools_loop])
+            pipeline.name = f"{llm_name}-{config.defense}"
+            pipeline.effectguard_mode = config.defense
+            return pipeline
         if config.defense is None:
             tools_loop = ToolsExecutionLoop([ToolsExecutor(tool_output_formatter), llm])
             pipeline = cls([system_message_component, init_query_component, llm, tools_loop])
