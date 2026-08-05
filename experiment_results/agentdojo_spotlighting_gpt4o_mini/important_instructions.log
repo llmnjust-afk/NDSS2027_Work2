@@ -1,0 +1,35 @@
+Benchmarking suites workspace, travel, banking, slack
+/data/lab/NDSS2027_Work2/src/agentdojo/scripts/benchmark.py:42: UserWarning: No .env file found
+  warnings.warn("No .env file found")
+Running benchmark for suite: 'workspace'
+Using model: 'openai-compatible'
+Using attack: 'important_instructions'
+Using defense: 'spotlighting_with_delimiting'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/data/lab/NDSS2027_Work2/src/agentdojo/scripts/benchmark.py", line 309, in <module>
+    main()
+  File "/data/lab/NDSS2027_Work2/.venv/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/lab/NDSS2027_Work2/.venv/lib/python3.12/site-packages/click/core.py", line 1082, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/data/lab/NDSS2027_Work2/.venv/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/lab/NDSS2027_Work2/.venv/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+    return __callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/lab/NDSS2027_Work2/src/agentdojo/scripts/benchmark.py", line 244, in main
+    results[suite_name] = benchmark_suite(
+                          ^^^^^^^^^^^^^^^^
+  File "/data/lab/NDSS2027_Work2/src/agentdojo/scripts/benchmark.py", line 53, in benchmark_suite
+    pipeline = AgentPipeline.from_config(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/lab/NDSS2027_Work2/src/agentdojo/agent_pipeline/agent_pipeline.py", line 201, in from_config
+    get_llm(MODEL_PROVIDERS[ModelsEnum(config.llm)], config.llm, config.model_id, config.tool_delimiter)
+  File "/data/lab/NDSS2027_Work2/src/agentdojo/agent_pipeline/agent_pipeline.py", line 129, in get_llm
+    raise ValueError("OPENAI_COMPATIBLE_API_KEY environment variable is required for openai-compatible provider")
+ValueError: OPENAI_COMPATIBLE_API_KEY environment variable is required for openai-compatible provider
