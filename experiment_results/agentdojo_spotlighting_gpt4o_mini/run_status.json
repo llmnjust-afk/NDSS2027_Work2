@@ -1,7 +1,7 @@
 {
-  "finished_at": "2026-08-05T12:05:11.953058+00:00",
-  "exit_code": 1,
-  "completed": false,
+  "finished_at": "2026-08-05T19:23:07.769374+00:00",
+  "exit_code": 0,
+  "completed": true,
   "model": "gpt-4o-mini-2024-07-18",
   "benchmark_version": "1.2.2",
   "defense": "spotlighting_with_delimiting",
