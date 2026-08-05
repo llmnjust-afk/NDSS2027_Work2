@@ -1,0 +1,20 @@
+{
+  "started_at": "2026-08-05T03:38:23Z",
+  "finished_at": "2026-08-05T04:02:36Z",
+  "exit_code": 1,
+  "completed": false,
+  "provider": "chatanywhere",
+  "model": "gpt-4o-mini-2024-07-18",
+  "benchmark_version": "1.2.2",
+  "suites": [
+    "workspace",
+    "travel",
+    "banking",
+    "slack"
+  ],
+  "attacks": [
+    "important_instructions",
+    "tool_knowledge"
+  ],
+  "defense": "none"
+}
