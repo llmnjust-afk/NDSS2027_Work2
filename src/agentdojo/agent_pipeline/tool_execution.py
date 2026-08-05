@@ -5,6 +5,7 @@ import yaml
 from pydantic import BaseModel
 
 from agentdojo.agent_pipeline.base_pipeline_element import BasePipelineElement
+from agentdojo.agent_pipeline.errors import AbortAgentError
 from agentdojo.agent_pipeline.llms.google_llm import EMPTY_FUNCTION_NAME
 from agentdojo.functions_runtime import EmptyEnv, Env, FunctionReturnType, FunctionsRuntime
 from agentdojo.logging import Logger
@@ -52,8 +53,13 @@ class ToolsExecutor(BasePipelineElement):
             converts the output to structured YAML.
     """
 
-    def __init__(self, tool_output_formatter: Callable[[FunctionReturnType], str] = tool_result_to_str) -> None:
+    def __init__(
+        self,
+        tool_output_formatter: Callable[[FunctionReturnType], str] = tool_result_to_str,
+        max_tool_calls_per_message: int = 128,
+    ) -> None:
         self.output_formatter = tool_output_formatter
+        self.max_tool_calls_per_message = max_tool_calls_per_message
 
     def query(
         self,
@@ -69,6 +75,12 @@ class ToolsExecutor(BasePipelineElement):
             return query, runtime, env, messages, extra_args
         if messages[-1]["tool_calls"] is None or len(messages[-1]["tool_calls"]) == 0:
             return query, runtime, env, messages, extra_args
+        if len(messages[-1]["tool_calls"]) > self.max_tool_calls_per_message:
+            raise AbortAgentError(
+                f"Agent produced more than {self.max_tool_calls_per_message} tool calls in one message; execution aborted.",
+                list(messages),
+                env,
+            )
 
         tool_call_results = []
         for tool_call in messages[-1]["tool_calls"]:
