@@ -9,7 +9,7 @@ from .models import GuardMode, ToolEffectSpec
 from .runtime import EffectGuardRuntime
 
 _READ_PREFIXES = ("get_", "read_", "search_", "list_", "check_")
-_READ_TOOLS = {"post_webpage"}
+_READ_TOOLS: set[str] = set()
 _TARGET_ARGS = (
     "recipients",
     "recipient",
@@ -42,14 +42,20 @@ def build_authorized_runtime(
 ) -> EffectGuardRuntime:
     runtime = EffectGuardRuntime(functions, mode=mode, session="agentdojo-task")
     effectful = [call for call in authorizations if is_effectful_tool(call.function)]
+    target_args: dict[str, str | None] = {}
+    for call in effectful:
+        target_args.setdefault(call.function, _target_arg(dict(call.args)))
+    for function in functions:
+        if is_effectful_tool(function.name):
+            runtime.register_effect_tool(
+                function.name,
+                ToolEffectSpec(operation=function.name, target_arg=target_args.get(function.name)),
+            )
+
     cardinalities = Counter((call.function, repr(dict(call.args))) for call in effectful)
     registered: set[tuple[str, str]] = set()
     for call in effectful:
         key = (call.function, repr(dict(call.args)))
-        runtime.register_effect_tool(
-            call.function,
-            ToolEffectSpec(operation=call.function, target_arg=_target_arg(dict(call.args))),
-        )
         if key not in registered:
             runtime.register_initial_effect(
                 call.function,

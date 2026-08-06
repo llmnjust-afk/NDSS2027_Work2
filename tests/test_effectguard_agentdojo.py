@@ -18,6 +18,25 @@ def send_message(recipient: str, body: str) -> str:
     return f"{recipient}:{body}"
 
 
+@make_function
+def delete_message(message_id: str) -> str:
+    """Deletes a message.
+
+    :param message_id: Message identifier.
+    """
+    return message_id
+
+
+@make_function
+def post_webpage(url: str, content: str) -> str:
+    """Posts webpage content.
+
+    :param url: Webpage URL.
+    :param content: Webpage content.
+    """
+    return f"{url}:{content}"
+
+
 def test_reads_pass_without_authorization() -> None:
     runtime = build_authorized_runtime([read_value, send_message], [], mode="effectguard")
     result, error = runtime.run_function(None, "read_value", {})
@@ -48,3 +67,16 @@ def test_call_boundary_allows_changed_arguments_once() -> None:
     result, error = runtime.run_function(None, "send_message", {"recipient": "mallory", "body": "hello"})
     assert result == "mallory:hello"
     assert error is None
+
+
+def test_unauthorized_effectful_tool_is_denied() -> None:
+    authorization = FunctionCall(function="send_message", args={"recipient": "alice", "body": "hello"})
+    runtime = build_authorized_runtime([send_message, delete_message], [authorization], mode="effectguard")
+    _, error = runtime.run_function(None, "delete_message", {"message_id": "message-1"})
+    assert error == "EffectDeniedError: missing authorization"
+
+
+def test_post_webpage_requires_authorization() -> None:
+    runtime = build_authorized_runtime([post_webpage], [], mode="effectguard")
+    _, error = runtime.run_function(None, "post_webpage", {"url": "example.com", "content": "changed"})
+    assert error == "EffectDeniedError: missing authorization"
