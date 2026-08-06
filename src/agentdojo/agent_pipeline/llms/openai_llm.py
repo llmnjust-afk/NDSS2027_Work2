@@ -195,10 +195,19 @@ class OpenAILLM(BasePipelineElement):
     ) -> tuple[str, FunctionsRuntime, Env, Sequence[ChatMessage], dict]:
         openai_messages = [_message_to_openai(message, self.model) for message in messages]
         openai_tools = [_function_to_openai(tool) for tool in runtime.functions.values()]
-        completion = chat_completion_request(
-            self.client, self.model, openai_messages, openai_tools, self.reasoning_effort, self.temperature
-        )
-        output = _openai_to_assistant_message(completion.choices[0].message)
+        parse_error: json.JSONDecodeError | None = None
+        for _ in range(3):
+            completion = chat_completion_request(
+                self.client, self.model, openai_messages, openai_tools, self.reasoning_effort, self.temperature
+            )
+            try:
+                output = _openai_to_assistant_message(completion.choices[0].message)
+                break
+            except json.JSONDecodeError as error:
+                parse_error = error
+        else:
+            assert parse_error is not None
+            raise parse_error
         messages = [*messages, output]
         return query, runtime, env, messages, extra_args
 
