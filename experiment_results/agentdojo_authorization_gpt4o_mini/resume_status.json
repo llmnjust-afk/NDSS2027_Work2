@@ -1,0 +1,18 @@
+{
+  "finished_at": "2026-08-06T21:17:53.084879+00:00",
+  "exit_code": 0,
+  "completed": true,
+  "resumed_from_cached_results": 46,
+  "model": "gpt-4o-mini-2024-07-18",
+  "benchmark_version": "1.2.2",
+  "defenses": [
+    "effectguard",
+    "final_recheck"
+  ],
+  "attacks": [
+    "important_instructions",
+    "tool_knowledge"
+  ],
+  "authorization_source": "user_task_ground_truth_oracle",
+  "malformed_tool_call_retries": 3
+}
