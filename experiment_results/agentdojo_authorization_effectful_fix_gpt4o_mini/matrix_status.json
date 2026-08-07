@@ -1,0 +1,18 @@
+{
+  "attacks": [
+    "important_instructions",
+    "tool_knowledge"
+  ],
+  "authorization_source": "user_task_ground_truth_oracle",
+  "benchmark_version": "1.2.2",
+  "completed": true,
+  "defenses": [
+    "effectguard",
+    "final_recheck"
+  ],
+  "effectful_tool_registration_fix": "96e6e977474acbec1ee02e0009cab14b2b0c55bb",
+  "finished_at": "2026-08-07T21:05:25.626693+00:00",
+  "force_rerun": true,
+  "malformed_tool_call_retries": 3,
+  "model": "gpt-4o-mini-2024-07-18"
+}
